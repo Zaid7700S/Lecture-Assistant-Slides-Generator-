@@ -10,6 +10,13 @@ load_dotenv()
 def extract_claims(state: GraphState) -> dict:
     print("---NODE: EXTRACT---")
     api_key = state.get("groq_api_key")
+    
+    # Print what we received
+    if api_key:
+        print(f"Extract node received API Key: {api_key[:5]}...")
+    else:
+        print("Extract node did NOT receive an API Key!")
+        
     model_name = "openai/gpt-oss-20b"
     llm = ChatGroq(model=model_name, temperature=0, max_tokens=2000, groq_api_key=api_key)
 
