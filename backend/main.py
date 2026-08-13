@@ -38,6 +38,12 @@ def start_graph(request: Request, payload: dict = Body(...)):
         
         groq_api_key = request.headers.get("X-Groq-Key")
         
+        # CHECK IF API KEY IS MISSING
+        if not groq_api_key:
+            raise HTTPException(status_code=400, detail="Missing Groq API Key in headers.")
+            
+        print(f"Received API Key starting with: {groq_api_key[:5]}...")
+        
         thread_id = str(uuid.uuid4())
         config = {"configurable": {"thread_id": thread_id}}
         
