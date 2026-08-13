@@ -1,6 +1,6 @@
 import os
 import uuid
-from fastapi import FastAPI, Body, Request
+from fastapi import FastAPI, Body, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from dotenv import load_dotenv
@@ -32,94 +32,97 @@ def read_root():
 
 @app.post("/start-graph")
 def start_graph(request: Request, payload: dict = Body(...)):
-    topic = payload.get("topic", "Introduction to AI")
-    duration = payload.get("lecture_duration", 30)
-    
-    # Get API key from frontend headers
-    groq_api_key = request.headers.get("X-Groq-Key")
-    
-    thread_id = str(uuid.uuid4())
-    config = {"configurable": {"thread_id": thread_id}}
-    
-    initial_state = {
-        "topic": topic,
-        "lecture_duration": duration,
-        "logs": [],
-        "groq_api_key": groq_api_key  # Passed into state here!
-    }
-    
-    app_graph.invoke(initial_state, config=config)
-    current_state = app_graph.get_state(config)
-    
-    return {
-        "thread_id": thread_id,
-        "message": "Graph paused for HITL 1 (Plan Review).",
-        "draft_plan": current_state.values.get("draft_plan", ""),
-        "extracted_claims": current_state.values.get("extracted_claims", [])
-    }
+    try:
+        topic = payload.get("topic", "Introduction to AI")
+        duration = payload.get("lecture_duration", 30)
+        
+        groq_api_key = request.headers.get("X-Groq-Key")
+        
+        thread_id = str(uuid.uuid4())
+        config = {"configurable": {"thread_id": thread_id}}
+        
+        initial_state = {
+            "topic": topic,
+            "lecture_duration": duration,
+            "logs": [],
+            "groq_api_key": groq_api_key
+        }
+        
+        app_graph.invoke(initial_state, config=config)
+        current_state = app_graph.get_state(config)
+        
+        return {
+            "thread_id": thread_id,
+            "message": "Graph paused for HITL 1 (Plan Review).",
+            "draft_plan": current_state.values.get("draft_plan", ""),
+            "extracted_claims": current_state.values.get("extracted_claims", [])
+        }
+    except Exception as e:
+        print(f"ERROR in start_graph: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/resume-graph")
 def resume_graph(request: Request, payload: dict = Body(...)):
-    thread_id = payload.get("thread_id")
-    config = {"configurable": {"thread_id": thread_id}}
-    
-    if "verified_claims" in payload:
-        verified_claims = payload.get("verified_claims")
-        app_graph.update_state(config, {"verified_claims": verified_claims})
-        app_graph.invoke(None, config=config)
-        current_state = app_graph.get_state(config)
-        return {
-            "message": "Graph resumed and brief generated.",
-            "final_brief": current_state.values.get("final_brief", {}),
-            "logs": current_state.values.get("logs", [])
-        }
-    else:
-        human_decision = payload.get("human_decision", "Approve")
-        custom_text = payload.get("custom_text", "")
+    try:
+        thread_id = payload.get("thread_id")
+        config = {"configurable": {"thread_id": thread_id}}
         
-        app_graph.update_state(config, {
-            "human_decision": human_decision,
-            "custom_text": custom_text
-        })
-        
-        app_graph.invoke(None, config=config)
-        current_state = app_graph.get_state(config)
-        
-        if human_decision == "Approve":
+        if "verified_claims" in payload:
+            verified_claims = payload.get("verified_claims")
+            app_graph.update_state(config, {"verified_claims": verified_claims})
+            app_graph.invoke(None, config=config)
+            current_state = app_graph.get_state(config)
             return {
-                "message": "Graph refined and paused for HITL 2 (Fact Verification).",
-                "refined_plan": current_state.values.get("draft_plan", ""),
-                "extracted_claims": current_state.values.get("extracted_claims", []),
-                "next_stage": "review_2"
+                "message": "Graph resumed and brief generated.",
+                "final_brief": current_state.values.get("final_brief", {}),
+                "logs": current_state.values.get("logs", [])
             }
         else:
-            return {
-                "message": "Plan reworked. Paused for HITL 1 review again.",
-                "draft_plan": current_state.values.get("draft_plan", ""),
-                "extracted_claims": current_state.values.get("extracted_claims", []),
-                "next_stage": "review_1"
-            }
+            human_decision = payload.get("human_decision", "Approve")
+            custom_text = payload.get("custom_text", "")
+            
+            app_graph.update_state(config, {
+                "human_decision": human_decision,
+                "custom_text": custom_text
+            })
+            
+            app_graph.invoke(None, config=config)
+            current_state = app_graph.get_state(config)
+            
+            if human_decision == "Approve":
+                return {
+                    "message": "Graph refined and paused for HITL 2 (Fact Verification).",
+                    "refined_plan": current_state.values.get("draft_plan", ""),
+                    "extracted_claims": current_state.values.get("extracted_claims", []),
+                    "next_stage": "review_2"
+                }
+            else:
+                return {
+                    "message": "Plan reworked. Paused for HITL 1 review again.",
+                    "draft_plan": current_state.values.get("draft_plan", ""),
+                    "extracted_claims": current_state.values.get("extracted_claims", []),
+                    "next_stage": "review_1"
+                }
+    except Exception as e:
+        print(f"ERROR in resume_graph: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/download-pptx")
 def download_pptx(payload: dict = Body(...)):
-    thread_id = payload.get("thread_id")
-    config = {"configurable": {"thread_id": thread_id}}
+    try:
+        thread_id = payload.get("thread_id")
+        config = {"configurable": {"thread_id": thread_id}}
 
-    current_state = app_graph.get_state(config)
-    slides_data = current_state.values.get("final_brief", {}).get("slides", [])
+        current_state = app_graph.get_state(config)
+        slides_data = current_state.values.get("final_brief", {}).get("slides", [])
 
-    file_path = build_deck(slides_data, out_path="lecture_slides_temp.pptx")
+        file_path = build_deck(slides_data, out_path="lecture_slides_temp.pptx")
 
-    return FileResponse(
-        path=file_path,
-        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
-        filename="lecture_deck.pptx"
-    )
-
-@app.head("/health")
-def health_check():
-    """
-    Lightweight HEAD endpoint for uptime monitoring (e.g., Render, UptimeRobot).
-    Returns a 200 OK status with no response body.
-    """
-    return Response(status_code=200)
+        return FileResponse(
+            path=file_path,
+            media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            filename="lecture_deck.pptx"
+        )
+    except Exception as e:
+        print(f"ERROR in download_pptx: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
