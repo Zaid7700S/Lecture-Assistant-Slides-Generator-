@@ -110,3 +110,11 @@ def download_pptx(payload: dict = Body(...)):
         media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
         filename="lecture_deck.pptx"
     )
+
+@app.head("/health")
+def health_check():
+    """
+    Lightweight HEAD endpoint for uptime monitoring (e.g., Render, UptimeRobot).
+    Returns a 200 OK status with no response body.
+    """
+    return Response(status_code=200)
