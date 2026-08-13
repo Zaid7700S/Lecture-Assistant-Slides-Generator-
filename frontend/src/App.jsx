@@ -167,7 +167,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-offwhite flex flex-col md:flex-row overflow-hidden">
+    <div className="min-h-screen bg-black text-offwhite flex flex-col md:flex-row">
 
       {/* API KEY MODAL */}
       <AnimatePresence>
@@ -237,14 +237,14 @@ function App() {
       </AnimatePresence>
 
       {/* LEFT PANEL */}
-      <div className="w-full md:w-[380px] p-8 bg-darkgray shadow-2xl flex flex-col border-r border-crimson/20 h-screen sticky top-0 z-30">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex justify-between items-start">
+      {/* Removed h-screen and sticky for mobile, added md: prefixes to enable them only on desktop */}
+      <div className="w-full md:w-[380px] p-6 md:p-8 bg-darkgray shadow-2xl flex flex-col border-b md:border-b-0 md:border-r border-crimson/20 md:h-screen md:sticky md:top-0 z-30">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 md:mb-8 flex justify-between items-start">
           <div>
-            {/* Changed to text-offwhite */}
-            <h1 className="text-3xl font-bold mb-1 text-offwhite flex items-center gap-2">
+            <h1 className="text-2xl md:text-3xl font-bold mb-1 text-offwhite flex items-center gap-2">
               <Sparkles className="text-crimson" /> Lecture Agent
             </h1>
-            <p className="text-sm opacity-60 text-offwhite">LangGraph + HITL + Groq</p>
+            <p className="text-xs md:text-sm opacity-60 text-offwhite">LangGraph + HITL + Groq</p>
           </div>
           <button 
             onClick={() => setShowApiKeyModal(true)}
@@ -255,9 +255,10 @@ function App() {
           </button>
         </motion.div>
 
-        <div className="flex-1 overflow-y-auto pr-2 custom-scroll">
+        {/* Removed overflow-y-auto for mobile so it pushes the page down naturally */}
+        <div className="flex-1 md:overflow-y-auto md:pr-2 custom-scroll">
           {isLoading ? (
-            <div className="h-full flex flex-col items-center justify-center gap-4">
+            <div className="h-full flex flex-col items-center justify-center gap-4 py-20 md:py-0">
               <Loader2 className="w-12 h-12 text-crimson animate-spin" />
               <p className="text-crimson font-medium text-center px-4">{loadingStage}</p>
             </div>
@@ -306,7 +307,7 @@ function App() {
 
                   <div className="bg-black/50 p-4 rounded-2xl border border-crimson/20 shadow-inner">
                     <h3 className="font-bold text-crimson mb-3 text-sm flex items-center gap-2"><CheckCircle2 size={16} /> Process Trace</h3>
-                    <div className="space-y-4 max-h-96 overflow-y-auto pr-2 custom-scroll">
+                    <div className="space-y-4 max-h-60 md:max-h-96 overflow-y-auto pr-2 custom-scroll">
                       {logs.map((log, i) => (
                         <div key={i} className="border-l-2 border-crimson pl-3">
                           <div className="font-bold text-crimson text-xs uppercase">{log.node}</div>
@@ -327,25 +328,24 @@ function App() {
       </div>
 
       {/* RIGHT PANEL */}
-      <div className="flex-1 p-8 md:p-12 overflow-auto bg-black custom-scroll" style={{ height: "100vh" }}>
+      {/* Removed h-screen style, allowed to grow with content on mobile */}
+      <div className="flex-1 p-6 md:p-12 bg-black custom-scroll md:h-screen md:overflow-auto">
         <AnimatePresence mode="wait">
 
           {stage === 'input' && (
-            <motion.div key="welcome" className="h-full flex items-center justify-center text-center" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
+            <motion.div key="welcome" className="h-full flex items-center justify-center text-center py-10 md:py-0" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
               <div>
-                {/* Changed to text-offwhite */}
-                <h2 className="text-5xl font-bold text-offwhite mb-4 drop-shadow-lg">Slide Generator</h2>
-                <p className="text-offwhite opacity-60 max-w-lg mx-auto text-lg">Enter a topic on the left to begin. The agent will research, extract claims, ask for your review, and generate a dynamic slide deck.</p>
+                <h2 className="text-4xl md:text-5xl font-bold text-offwhite mb-4 drop-shadow-lg">Slide Generator</h2>
+                <p className="text-offwhite opacity-60 max-w-lg mx-auto text-base md:text-lg">Enter a topic on the left to begin. The agent will research, extract claims, ask for your review, and generate a dynamic slide deck.</p>
               </div>
             </motion.div>
           )}
 
           {stage === 'review_1' && (
             <motion.div key="review_1" className="max-w-4xl mx-auto" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-              {/* Changed to text-offwhite */}
-              <h2 className="text-3xl font-bold text-offwhite mb-6">HITL 1: Plan Review</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-offwhite mb-6">HITL 1: Plan Review</h2>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
                 <div className="bg-darkgray p-6 rounded-2xl border border-crimson/20 shadow-xl">
                   <h3 className="font-bold text-crimson mb-4 text-lg">Draft Plan</h3>
                   <div className="text-sm text-offwhite/90">
@@ -386,8 +386,7 @@ function App() {
 
           {stage === 'review_2' && (
             <motion.div key="review_2" className="max-w-4xl mx-auto" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-              {/* Changed to text-offwhite */}
-              <h2 className="text-3xl font-bold text-offwhite mb-6">HITL 2: Fact Verification</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-offwhite mb-6">HITL 2: Fact Verification</h2>
 
               <div className="bg-darkgray p-6 rounded-2xl border border-crimson/20 shadow-xl mb-8">
                 <h3 className="font-bold text-crimson mb-4 text-lg">Refined Plan</h3>
@@ -427,11 +426,10 @@ function App() {
 
           {stage === 'final' && (
             <motion.div key="final_slides" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              {/* Changed to text-offwhite */}
-              <motion.h2 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-bold text-offwhite mb-8 drop-shadow">
+              <motion.h2 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-2xl md:text-3xl font-bold text-offwhite mb-8 drop-shadow">
                 Generated Deck ({slides.length} Slides)
               </motion.h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 pb-12">
                 <AnimatePresence>
                   {slides.map((slide, index) => (
                     <motion.div 
@@ -440,14 +438,14 @@ function App() {
                       initial={{ opacity: 0, y: 50 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="bg-darkgray shadow-2xl rounded-2xl p-8 text-offwhite min-h-[300px] flex flex-col border border-crimson/20 hover:shadow-crimson/20 hover:-translate-y-1 transition-all duration-300"
+                      className="bg-darkgray shadow-2xl rounded-2xl p-6 md:p-8 text-offwhite min-h-[300px] flex flex-col border border-crimson/20 hover:shadow-crimson/20 hover:-translate-y-1 transition-all duration-300"
                     >
-                      <h3 className="text-2xl font-bold text-crimson mb-2">{slide.title}</h3>
+                      <h3 className="text-xl md:text-2xl font-bold text-crimson mb-2">{slide.title}</h3>
                       {slide.subtitle && <p className="text-sm text-offwhite/60 mb-4 pb-4 border-b border-crimson/10">{slide.subtitle}</p>}
                       
                       <ul className={`space-y-3 text-offwhite/80 flex-1 mt-2 ${slide.bullets?.length === 1 ? 'flex items-center justify-center' : ''}`}>
                         {slide.bullets?.map((point, i) => (
-                          <li key={i} className={`flex items-start gap-3 ${slide.bullets?.length === 1 ? 'text-xl text-center font-medium text-offwhite' : 'text-base'}`}>
+                          <li key={i} className={`flex items-start gap-3 ${slide.bullets?.length === 1 ? 'text-lg md:text-xl text-center font-medium text-offwhite' : 'text-sm md:text-base'}`}>
                             {slide.bullets?.length > 1 && <span className="text-crimson mt-1.5 text-xs">●</span>}
                             <span>{point}</span>
                           </li>
