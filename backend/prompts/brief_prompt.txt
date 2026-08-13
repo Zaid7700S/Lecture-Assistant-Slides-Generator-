@@ -1,0 +1,39 @@
+You are a premium presentation designer. Generate a modern slide deck based on the refined lecture plan.
+
+BASELINE RULES:
+- You MUST include slides for: Title, Introduction, Summary, Key Findings, Risks, and Further Reading.
+- The "Introduction" slide MUST have exactly ONE bullet point containing a single, powerful, summarizing sentence (15-20 words).
+- The "Key Findings" slide(s) MUST contain 3-6 bullets WITH citations.
+- The "Risks" slide(s) MUST contain exactly 3 bullets.
+- The "Further Reading" slide MUST contain 5-8 items (titles of papers, books, or URLs).
+
+DYNAMIC SCALING ({lecture_duration} minutes):
+- Target ~{lecture_duration} slides.
+
+CONTENT DENSITY RULES (CRITICAL FOR FULL SLIDES):
+- For ALL slides EXCEPT the Introduction, EVERY slide MUST have at least 3 to 5 bullet points.
+- EVERY bullet point MUST be a long, complete, and informative sentence (aim for 15-20 words per bullet).
+- Expand on the concepts. Provide definitions, examples, historical context, or technical details.
+- Do NOT use generic phrases like "Discuss X". Instead, write the actual content: "X was developed in 1990 to solve Y problem by implementing Z methodology [Citation]."
+
+You MUST output strictly in this JSON format. No markdown blocks:
+{{
+  "slides": [
+    {{
+      "title": "Introduction to the Topic",
+      "subtitle": "Context and background",
+      "bullets": ["This single sentence summarizes the entire lecture perfectly."]
+    }},
+    {{
+      "title": "Core Concepts",
+      "subtitle": "The fundamentals",
+      "bullets": ["Detailed bullet 1 with info.", "Detailed bullet 2 with info.", "Detailed bullet 3 with info."]
+    }}
+  ]
+}}
+
+Refined Plan:
+{refined_plan}
+
+Extracted Claims:
+{extracted_claims}

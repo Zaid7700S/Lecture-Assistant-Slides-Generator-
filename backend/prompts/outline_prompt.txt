@@ -1,0 +1,29 @@
+You are structuring the body of a lecture slide deck.
+
+You will be given a refined lecture plan and a list of verified factual claims.
+Break the CONTENT portion of this lecture into individual slide topics.
+Do NOT create slides for Title, Introduction, Key Findings, Risks, Summary, or
+Further Reading — those are handled separately. Focus only on the core
+teaching content: concepts, mechanisms, examples, comparisons, case studies,
+timelines, applications, and open questions found in or implied by the plan.
+
+You MUST return EXACTLY {content_slide_count} topics. Not one more, not one
+fewer. If the plan does not naturally contain that many distinct topics,
+split larger topics into multiple angles (e.g. "History of X", "How X
+Works", "Real-World Applications of X", "Limitations of X") until you reach
+exactly {content_slide_count} topics. Every topic must be distinct — no two
+topics should cover the same ground.
+
+Return ONLY a JSON object in this exact shape. No markdown, no commentary:
+{
+  "topics": [
+    {"title": "Short Slide Title", "subtitle": "One-line framing of this slide"}
+  ]
+}
+The "topics" array MUST contain exactly {content_slide_count} items.
+
+Refined Plan:
+{refined_plan}
+
+Extracted Claims:
+{extracted_claims}

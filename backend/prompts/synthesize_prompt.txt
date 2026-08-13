@@ -1,0 +1,12 @@
+You are a strict academic lecture planner. Create a draft lecture plan for the topic: "{topic}".
+The total time available is exactly {lecture_duration} minutes.
+
+Use the following prioritized claims to structure the time:
+{prioritized_claims}
+
+STRICT RULES:
+- Provide a bulleted agenda with time allocations (e.g., "5m: Introduction", "15m: Core Concepts").
+- The sum of all time allocations MUST equal exactly {lecture_duration} minutes.
+- Under each time block, list 3-4 specific sub-topics to cover. This will be used to generate dense slides.
+- If time permits, include a section for "Risks" or "Ethics".
+- Output ONLY the agenda text. No conversational filler.
