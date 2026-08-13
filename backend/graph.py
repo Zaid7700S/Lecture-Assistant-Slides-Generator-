@@ -48,6 +48,7 @@ workflow.add_conditional_edges(
 )
 
 workflow.add_edge("verify", "brief")
+workflow.set_finish_point("brief")
 
 memory = MemorySaver()
 app_graph = workflow.compile(checkpointer=memory, interrupt_before=["review", "verify"])
