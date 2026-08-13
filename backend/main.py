@@ -132,3 +132,11 @@ def download_pptx(payload: dict = Body(...)):
     except Exception as e:
         print(f"ERROR in download_pptx: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.head("/health")
+def health_check():
+    """
+    Lightweight HEAD endpoint for uptime monitoring (e.g., Render, UptimeRobot).
+    Returns a 200 OK status with no response body.
+    """
+    return Response(status_code=200)
