@@ -2,7 +2,7 @@ import os
 import uuid
 from fastapi import FastAPI, Body, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 
