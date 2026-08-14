@@ -1,5 +1,6 @@
 # backend/nodes/extract.py
 import json
+import re
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 from backend.state import GraphState
@@ -7,18 +8,22 @@ from backend.logger import create_log_entry
 
 load_dotenv()
 
+def _safe_parse_claims(raw_output: str):
+    array_match = re.search(r'\[.*\]', raw_output, re.DOTALL)
+    if not array_match:
+        return None
+    json_str = re.sub(r',\s*([}\]])', r'\1', array_match.group(0))
+    try:
+        parsed = json.loads(json_str)
+        return parsed if isinstance(parsed, list) else None
+    except json.JSONDecodeError:
+        return None
+
 def extract_claims(state: GraphState) -> dict:
     print("---NODE: EXTRACT---")
     api_key = state.get("groq_api_key")
-    
-    # Print what we received
-    if api_key:
-        print(f"Extract node received API Key: {api_key[:5]}...")
-    else:
-        print("Extract node did NOT receive an API Key!")
-        
     model_name = "openai/gpt-oss-20b"
-    llm = ChatGroq(model=model_name, temperature=0, max_tokens=2000, groq_api_key=api_key)
+    llm = ChatGroq(model=model_name, temperature=0, max_tokens=3000, groq_api_key=api_key)
 
     with open("backend/prompts/extract_prompt.txt", "r") as f:
         prompt_template = f.read()
@@ -33,11 +38,10 @@ def extract_claims(state: GraphState) -> dict:
     prompt = prompt.replace("{max_claims}", str(max_claims))
 
     response = llm.invoke(prompt)
-    cleaned_response = response.content.replace("```json", "").replace("```", "").strip()
+    claims = _safe_parse_claims(response.content)
 
-    try:
-        claims = json.loads(cleaned_response)
-    except json.JSONDecodeError:
+    if not claims:
+        print(f"Claim parsing failed. Raw output: {response.content[:300]}")
         claims = ["Error parsing claims."]
 
     log_entry = create_log_entry(
