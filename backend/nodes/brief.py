@@ -40,6 +40,28 @@ def _fit_topics_to_length(topics, n, topic_label):
         })
     return topics
 
+def _ensure_custom_coverage(topics, custom_text, n):
+    """Guarantee the human's requested addition survives the outline stage,
+    even if the LLM ignored the REQUESTED ADDITIONS instruction."""
+    if not custom_text or not custom_text.strip():
+        return topics
+
+    needle = custom_text.strip().lower()[:40]
+    covered = any(
+        needle in (t.get("title", "") + " " + t.get("subtitle", "")).lower()
+        for t in topics
+    )
+    if covered:
+        return topics
+
+    print("Custom addition not found in outline output — injecting it manually.")
+    injected = {
+        "title": custom_text.strip()[:60],
+        "subtitle": "Requested addition",
+    }
+    # Replace the last topic rather than exceeding content_slide_count
+    return topics[:max(n - 1, 0)] + [injected]
+
 def _fallback_content_slide(topic):
     return {
         "title": topic.get("title", "Untitled"),
@@ -91,10 +113,12 @@ def generate_brief(state: GraphState) -> dict:
     outline_prompt = outline_template.replace("{content_slide_count}", str(content_slide_count))
     outline_prompt = outline_prompt.replace("{refined_plan}", refined_plan)
     outline_prompt = outline_prompt.replace("{extracted_claims}", claims_str)
+    outline_prompt = outline_prompt.replace("{custom_additions}", state.get("custom_text") or "None")  # NEW
 
     outline_response = outline_llm.invoke(outline_prompt)
     outline_json = safe_parse_json(outline_response.content) or {}
     topics = _fit_topics_to_length(outline_json.get("topics", []), content_slide_count, topic)
+    topics = _ensure_custom_coverage(topics, state.get("custom_text"), content_slide_count)  # NEW
 
     logs.append(create_log_entry(
         node_name="brief.outline",
