@@ -7,6 +7,13 @@ Further Reading — those are handled separately. Focus only on the core
 teaching content: concepts, mechanisms, examples, comparisons, case studies,
 timelines, applications, and open questions found in or implied by the plan.
 
+REQUESTED ADDITIONS (non-negotiable): the human reviewer specifically asked
+for the following to be included when they revised the plan. Each item below
+MUST map to at least one dedicated topic in your output, even if it means
+condensing or merging other topics to make room. If this field says "None",
+ignore this section.
+{custom_additions}
+
 You MUST return EXACTLY {content_slide_count} topics. Not one more, not one
 fewer. If the plan does not naturally contain that many distinct topics,
 split larger topics into multiple angles (e.g. "History of X", "How X
