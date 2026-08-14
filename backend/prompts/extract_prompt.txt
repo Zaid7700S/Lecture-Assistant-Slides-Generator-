@@ -4,8 +4,32 @@ Extract between {min_claims} and {max_claims} highly specific, factual claims �
 extract as many genuinely distinct, well-supported claims as the search
 results actually justify, up to that maximum. Do not invent claims the
 search results don't support just to hit the maximum.
+
+A claim MUST contain at least one of: a number/statistic, a date/year, a
+named technical term, a proper noun (product, paper, standard, organization)
+tied to a specific fact, or a described mechanism/process. 
+REJECT and do not output vague category statements like "X is a subfield of
+Y" or "X helps with everyday tasks" — these carry no teachable information.
+
+Examples:
+- BAD: "Artificial intelligence is a subfield of computer science."
+- GOOD: "Hugging Face's model hub surpassed 2 million publicly hosted models as of 2025 [Source: ...]."
+
 - Each claim must be a complete sentence containing actual data, definitions, or technical details.
-- Each claim MUST end with a citation including the real URL provided in the search results. Format: [Source: Website Name - URL]
+- Each claim MUST end with a citation. If the search results include a URL
+  for that claim, format it as [Source: Website Name - URL]. If no URL is
+  available for a given fact, use exactly [Source: General Knowledge - N/A].
+  Never invent or guess a URL.
+- Do not draw more than 2 claims from the same source URL. If one source is
+  much richer in extractable facts than the others, that is not a reason to
+  lean on it disproportionately — prioritize covering the FULL BREADTH of
+  the topic over extracting the maximum number of facts from one convenient
+  source.
+- If the topic implies a broad, multi-part subject (e.g. a country's history,
+  a field of study, an organization's evolution), your claims should reflect
+  that breadth — different eras, aspects, or dimensions of the topic — not
+  a deep dive into one narrow entity found in the search results, even if
+  that entity is well-documented.
 
 STRICT RULES:
 - Output ONLY a valid JSON array of strings.
